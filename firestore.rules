@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// ============================================================
+// GlassChat — Firestore Security Rules
+// ============================================================
+// Права адміністратора визначає ЛИШЕ сервер (ці правила).
+// Зміна HTML/JavaScript у браузері НЕ дає прав на запис —
+// Firestore відхилить запит від не-адміністратора.
+//
+// Адмін: tomnukoleksandr94@gmail.com (входить через Google).
+// Щоб змінити адміна — зміни email у функції isAdmin() і
+// опублікуй правила знову (Firestore → Rules → Publish).
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Адміністратор — перевірка email з Firebase Auth токена (серверна)
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'tomnukoleksandr94@gmail.com';
+    }
+
+    // Боти: читати може всі (сайт синхронізує список),
+    // писати — тільки адміністратор
+    match /bots/{botId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Глобальні налаштування (рулетка/голос/текст/обслуговування):
+    // читати може всі, писати — тільки адміністратор
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Профілі користувачів: користувач пише лише свій профіль,
+    // читати можна тільки свій профіль або адміну (лічильник у панелі)
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create, update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+  }
+}
