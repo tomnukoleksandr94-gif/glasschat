@@ -4,11 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>GlassChat — знайди нового співрозмовника</title>
-<meta name="description" content="GlassChat — чат-рулетка знайомств з віртуальними співрозмовниками. Обери мову, натисни кнопку — і почни розмову.">
+<meta name="description" content="GlassChat — чат-рулетка знайомств з віртуальними співрозмовниками. Обери мову, натисни кнопку — і почни розмову голосом або текстом.">
 <meta name="robots" content="index,follow">
+<meta name="keywords" content="GlassChat, чат рулетка, знайомства, анонімний чат, співрозмовник, голосовий чат, український чат">
+<link rel="canonical" href="https://tomnukoleksandr94-gif.github.io/glasschat/">
 <meta property="og:title" content="GlassChat — чат-рулетка знайомств">
-<meta property="og:description" content="Нові знайомства починаються тут. Віртуальні співрозмовники українською, англійською, французькою та російською.">
+<meta property="og:description" content="Нові знайомства починаються тут. Віртуальні співрозмовники українською, англійською, французькою та російською — голосом і текстом.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://tomnukoleksandr94-gif.github.io/glasschat/">
+<meta property="og:site_name" content="GlassChat">
+<meta property="og:locale" content="uk_UA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GlassChat — чат-рулетка знайомств">
+<meta name="twitter:description" content="Нові знайомства починаються тут. Віртуальні співрозмовники — голосом і текстом.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GlassChat",
+  "url": "https://tomnukoleksandr94-gif.github.io/glasschat/",
+  "applicationCategory": "SocialApplication",
+  "operatingSystem": "Any",
+  "inLanguage": ["uk", "en", "fr", "ru"],
+  "description": "Чат-рулетка знайомств з віртуальними співрозмовниками: голосом і текстом, чотирма мовами.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "UAH" }
+}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236FB5FF'/%3E%3Cstop offset='1' stop-color='%233E8BEA'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='4' y='4' width='56' height='56' rx='18' fill='url(%23g)'/%3E%3Cpath d='M20 26a12 12 0 0 1 24 0v6a12 12 0 0 1-24 0z' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M20 30h-3a4 4 0 0 0 0 8h3M44 30h3a4 4 0 0 1 0 8h-3' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
@@ -26,7 +47,7 @@
   --radius-sm:0.625rem;--radius-md:0.875rem;--radius-lg:1.25rem;--radius-xl:1.75rem;--radius-full:9999px;
   --ease:cubic-bezier(0.16,1,0.3,1);
   --t:200ms var(--ease);
-  --sidebar-w:4.5rem;
+  --sidebar-w:11.5rem;
 }
 /* light theme */
 :root,[data-theme="light"]{
@@ -313,6 +334,7 @@ input,textarea,select{font:inherit;color:inherit}
   flex:1;min-height:280px;max-height:calc(100dvh - 260px);overflow-y:auto;overscroll-behavior:contain;
   padding:var(--space-4);display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;
 }
+.msgs.with-voice{max-height:calc(100dvh - 312px)}
 .msg{display:flex;gap:10px;max-width:86%;animation:msgIn 300ms var(--ease)}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 [data-anim="off"] .msg{animation:none}
@@ -348,6 +370,41 @@ input,textarea,select{font:inherit;color:inherit}
 .send-btn svg{width:18px;height:18px}
 .icon-btn.rec{color:#fff;background:var(--danger);border-color:transparent;animation:pulse 1.2s infinite}
 .icon-btn.rec svg{width:16px;height:16px}
+
+/* voice conversation indicator */
+.voice-status{
+  display:none;align-items:center;gap:10px;padding:9px 14px;border-radius:var(--radius-full);
+  background:var(--accent-softer);border:1px solid var(--accent-soft);
+  font-size:var(--text-sm);font-weight:600;color:var(--accent);
+}
+.voice-status.on{display:flex;animation:screenIn 250ms var(--ease)}
+.voice-status .vs-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none;animation:pulse 1.4s infinite}
+.voice-status.speaking .vs-dot{display:none}
+.voice-status .vs-wave{display:none;gap:3px;align-items:center;height:18px;flex:none}
+.voice-status.speaking .vs-wave{display:flex}
+.vs-wave i{width:3px;height:5px;border-radius:2px;background:var(--accent);animation:vwave 1s infinite ease-in-out}
+.vs-wave i:nth-child(2){animation-delay:.12s}
+.vs-wave i:nth-child(3){animation-delay:.24s}
+.vs-wave i:nth-child(4){animation-delay:.36s}
+@keyframes vwave{0%,100%{height:5px}50%{height:16px}}
+[data-anim="off"] .vs-wave i,[data-anim="off"] .voice-status .vs-dot{animation:none}
+.vs-stop{
+  margin-left:auto;display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:var(--radius-full);flex:none;
+  background:var(--danger-soft);color:var(--danger);transition:transform 120ms var(--ease),background var(--t);
+}
+.vs-stop:hover{background:var(--danger);color:#fff}
+.vs-stop:active{transform:scale(.9)}
+
+/* press feedback + ripple */
+.btn,.chip,.icon-btn,.send-btn,.adm-btn,.ghost-btn,.snav-item,.bnav-item,.an-item,.an-back,.report-opt,.check-pill{
+  position:relative;overflow:hidden;
+  transition:transform 130ms var(--ease),background var(--t),color var(--t),border-color var(--t),box-shadow var(--t),opacity var(--t);
+}
+.btn:active,.chip:active,.adm-btn:active,.ghost-btn:active,.snav-item:active,.bnav-item:active,.an-item:active,.an-back:active,.report-opt:active,.check-pill:active{transform:scale(.955)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.16;transform:scale(0);animation:ripple 520ms var(--ease) forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(2.6);opacity:0}}
+[data-anim="off"] .ripple{display:none}
 
 /* ============================================================
    summary / lists / profile / settings
@@ -582,12 +639,13 @@ input,textarea,select{font:inherit;color:inherit}
   .app{grid-template-columns:1fr}
   .stage{padding-bottom:72px}
   .msgs{max-height:calc(100dvh - 320px)}
+  .msgs.with-voice{max-height:calc(100dvh - 372px)}
   .summ-actions{grid-template-columns:1fr 1fr}
   .admin-layout{grid-template-columns:1fr}
   .admin-nav{flex-direction:row;align-items:center;overflow-x:auto;gap:6px;padding:10px 12px;border-right:none;border-bottom:1px solid var(--glass-border);position:sticky;top:0;z-index:5}
   .an-brand{padding:0 4px;flex:none}
   .an-brand div{display:none}
-  .an-item{padding:8px 10px;white-space:nowrap;font-size:12px}
+  .an-item{padding:8px 10px;white-space:nowrap;font-size:12px;flex:none}
   .an-back{margin-top:0;flex:none;white-space:nowrap;padding:8px 10px;font-size:12px}
   .admin-main{padding:var(--space-4)}
   .br-actions{flex-wrap:wrap}
@@ -701,6 +759,12 @@ input,textarea,select{font:inherit;color:inherit}
             </div>
           </header>
           <div class="msgs glass" id="msgs" aria-live="polite"></div>
+          <div class="voice-status" id="voice-status" aria-live="polite">
+            <span class="vs-dot"></span>
+            <span class="vs-wave"><i></i><i></i><i></i><i></i></span>
+            <span id="vs-text"></span>
+            <button class="vs-stop" id="btn-vs-stop"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+          </div>
           <div class="inputbar glass" id="inputbar">
             <button class="icon-btn" id="btn-mic" aria-label="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></button>
             <input type="text" id="inp-msg" maxlength="500" autocomplete="off">
@@ -1112,6 +1176,7 @@ const I18N = {
     signedInToast: "Вітаємо, {name}!",
     signedOutToast: "Ти вийшов з акаунта.",
     listening: "Слухаю…",
+    vSpeaking: "говорить…", vVoiceHint: "Натисни мікрофон — і просто говори. Ти також можеш писати текстом будь-коли.",
     searchS1: "Шукаємо співрозмовника…", searchS2: "Підбираємо персонажа…", searchS3: "Майже готово…",
     searchSub: "GlassChat підбирає персонажа під твій запит", cancel: "Скасувати",
     statusSearching: "Пошук", statusConnected: "На зв'язку", statusDone: "Завершено",
@@ -1179,6 +1244,7 @@ const I18N = {
     signedInToast: "Welcome, {name}!",
     signedOutToast: "You signed out.",
     listening: "Listening…",
+    vSpeaking: "is speaking…", vVoiceHint: "Tap the mic and just talk. You can also type anytime.",
     searchS1: "Looking for a partner…", searchS2: "Matching a character…", searchS3: "Almost there…",
     searchSub: "GlassChat is matching a character to your request", cancel: "Cancel",
     statusSearching: "Searching", statusConnected: "Connected", statusDone: "Finished",
@@ -1857,7 +1923,7 @@ function applyRemoteCfg() {
     inp.placeholder = c.textEnabled ? t("msgPh") : t("textOffNote");
   }
   if (send) send.style.display = c.textEnabled ? "" : "none";
-  if (!c.voiceEnabled && state.listening) stopDictation();
+  if (!c.voiceEnabled && voiceConv.on) stopVoiceConv();
 }
 
 /* ---------------- auth UI ---------------- */
@@ -2154,7 +2220,7 @@ function showScreen(name) {
   $$("[data-snav]").forEach(b => b.classList.toggle("active", b.dataset.snav === name));
   $("#stage").scrollTop = 0;
   stopSpeak();
-  if (name !== "chat") { stopDictation(); stopTimer(); }
+  if (name !== "chat") { stopVoiceConv(); stopTimer(); }
   if (name === "welcome") renderWelcome();
   if (name === "history") renderHistory();
   if (name === "favorites") renderFavorites();
@@ -2257,6 +2323,7 @@ function chatStart(botId) {
   let greet = pick(L.greet);
   greet = fill(greet, { name: state.nickname || "", bot: bot.name });
   addMsg("sys", fill(t("convStart"), { bot: bot.name }));
+  if (!state.voiceHintShown) { state.voiceHintShown = true; addMsg("sys", t("vVoiceHint")); }
   const typing = showTyping();
   setTimeout(() => {
     typing.remove();
@@ -2322,16 +2389,18 @@ function nextPartner() {
   const cur = session() ? session().botId : state.lastBotId;
   if (pool.length > 1 && cur) pool = pool.filter(b => b.id !== cur);
   const bot = pick(pool);
-  stopSpeak(); stopDictation(); stopTimer();
+  stopSpeak(); stopVoiceConv(); stopTimer();
   state.curSession = null;
   chatStart(bot.id);
 }
 
-/* ---------------- mic dictation ---------------- */
-async function toggleDictation() {
-  if (state.listening) { stopDictation(); return; }
+/* ---------------- voice conversation (Nyme-style: speak & hear, text anytime) ---------------- */
+const voiceConv = { on: false, errStreak: 0 };
+async function toggleVoiceConv() {
+  if (voiceConv.on) { stopVoiceConv(); return; }
   if (!cfg().voiceEnabled) return;
   if (!recSupported()) { toast(t("tMicNo"), "err"); return; }
+  if (!session()) { toast(t("tEndFirst"), "err"); return; }
   if (!state.micAllowed) {
     try {
       const st = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -2339,28 +2408,80 @@ async function toggleDictation() {
       state.micAllowed = true; persist();
     } catch (e) { toast(t("micDenied"), "err"); return; }
   }
-  state.rec = startRecognition(
-    (final) => {
-      stopDictation();
-      const i = $("#inp-msg");
-      if (i) { i.value = (i.value ? i.value + " " : "") + final; i.focus(); }
-    },
-    (interim) => { const i = $("#inp-msg"); if (i) i.placeholder = interim || t("listening"); },
-    () => stopDictation()
-  );
-  if (state.rec) {
-    state.listening = true;
-    $("#btn-mic").classList.add("rec");
-    $("#inp-msg").placeholder = t("listening");
-  }
+  voiceConv.on = true;
+  voiceConv.errStreak = 0;
+  setVoiceUI("listening");
+  listenLoop();
 }
-function stopDictation() {
+function setVoiceUI(mode) {
+  const bar = $("#voice-status");
+  if (!bar) return;
+  bar.classList.toggle("on", !!mode);
+  bar.classList.toggle("speaking", mode === "speaking");
+  const txt = $("#vs-text");
+  const bot = session() ? botById(session().botId) : null;
+  if (mode === "listening") txt.textContent = t("listening");
+  else if (mode === "speaking") txt.textContent = (bot ? bot.name : "") + " " + t("vSpeaking");
+  const btn = $("#btn-mic");
+  if (btn) btn.classList.toggle("rec", mode === "listening");
+  const m = $("#msgs");
+  if (m) m.classList.toggle("with-voice", !!mode);
+}
+function stopRecOnly() {
   if (state.rec) { try { state.rec.stop(); } catch (e) {} state.rec = null; }
   state.listening = false;
-  const btn = $("#btn-mic"); if (btn) btn.classList.remove("rec");
-  const i = $("#inp-msg");
-  if (i) i.placeholder = cfg().textEnabled ? t("msgPh") : t("textOffNote");
 }
+function stopVoiceConv() {
+  voiceConv.on = false;
+  stopRecOnly();
+  const i = $("#inp-msg");
+  if (i && !i.value) i.placeholder = cfg().textEnabled ? t("msgPh") : t("textOffNote");
+  setVoiceUI(null);
+}
+function listenLoop() {
+  if (!voiceConv.on || !session()) { stopVoiceConv(); return; }
+  state.listening = true;
+  state.rec = startRecognition(
+    (final) => { voiceConv.errStreak = 0; voiceHandle(final); },
+    (interim) => { const i = $("#inp-msg"); if (i && !i.value) i.placeholder = interim || t("listening"); },
+    (err) => {
+      state.listening = false;
+      if (!voiceConv.on) return;
+      if (err === "not-allowed" || err === "service-not-allowed") { toast(t("micDenied"), "err"); stopVoiceConv(); return; }
+      voiceConv.errStreak++;
+      if (voiceConv.errStreak > 8) { stopVoiceConv(); return; }
+      setTimeout(() => { if (voiceConv.on && session()) listenLoop(); }, 500);
+    }
+  );
+}
+function voiceHandle(text) {
+  stopRecOnly();
+  setVoiceUI(null);
+  const s = session();
+  if (!s || !text) { if (voiceConv.on) listenLoop(); return; }
+  addMsg("user", text);
+  const i = $("#inp-msg"); if (i && !i.value) i.placeholder = cfg().textEnabled ? t("msgPh") : t("textOffNote");
+  const bot = botById(s.botId);
+  if (!bot) { if (voiceConv.on) stopVoiceConv(); return; }
+  const typing = showTyping();
+  const reply = generateReply(bot, text);
+  const delay = Math.min(1800, 600 + reply.length * 12);
+  setTimeout(() => {
+    typing.remove();
+    if (!session()) { if (voiceConv.on) stopVoiceConv(); return; }
+    addMsg("bot", reply);
+    if (!voiceConv.on) {
+      if (state.autoTTS && cfg().voiceEnabled) speakText(reply);
+      return;
+    }
+    setVoiceUI("speaking");
+    speakText(reply, () => {
+      if (voiceConv.on && session()) { setVoiceUI("listening"); listenLoop(); }
+      else if (voiceConv.on) stopVoiceConv();
+    });
+  }, delay);
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden && voiceConv.on) stopVoiceConv(); });
 
 /* ================================================================
    END OF CONVERSATION + SUMMARY
@@ -2368,7 +2489,7 @@ function stopDictation() {
 function endConversation() {
   const s = session();
   if (!s) { toast(t("tEndFirst"), "err"); return; }
-  stopDictation(); stopSpeak(); stopTimer();
+  stopVoiceConv(); stopSpeak(); stopTimer();
   const bot = botById(s.botId) || { name: "?", hue: 200 };
   state.lastSummary = {
     botId: s.botId, botName: bot.name, hue: bot.hue,
@@ -2753,7 +2874,22 @@ function bindEvents() {
   /* chat */
   $("#btn-send").addEventListener("click", sendUserText);
   $("#inp-msg").addEventListener("keydown", (e) => { if (e.key === "Enter") sendUserText(); });
-  $("#btn-mic").addEventListener("click", toggleDictation);
+  $("#btn-mic").addEventListener("click", toggleVoiceConv);
+  $("#btn-vs-stop").addEventListener("click", stopVoiceConv);
+  /* ripple press effect */
+  document.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest(".btn,.chip,.icon-btn,.send-btn,.adm-btn,.ghost-btn,.snav-item,.bnav-item,.an-item,.an-back,.report-opt,.check-pill,.vs-stop");
+    if (!b || !state.animations) return;
+    const r = b.getBoundingClientRect();
+    if (!r.width) return;
+    const sp = el("span", "ripple");
+    const size = Math.max(r.width, r.height);
+    sp.style.width = sp.style.height = size + "px";
+    sp.style.left = (e.clientX - r.left - size / 2) + "px";
+    sp.style.top = (e.clientY - r.top - size / 2) + "px";
+    b.appendChild(sp);
+    setTimeout(() => sp.remove(), 560);
+  });
   $("#btn-tts").addEventListener("click", () => {
     state.autoTTS = !state.autoTTS; persist();
     $("#btn-tts").classList.toggle("on", state.autoTTS);
